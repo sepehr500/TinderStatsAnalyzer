@@ -89,7 +89,7 @@ const App = () => {
           </h3>
           <ol className="text-black text-xl">
             <li>
-              1. Request you data by clicking{" "}
+              1. Request your data by clicking{" "}
               <a
                 target="_blank"
                 rel="noopener"
