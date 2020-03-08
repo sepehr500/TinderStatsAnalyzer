@@ -6,7 +6,7 @@ import Tippy from "@tippy.js/react";
 import { useDropzone } from "react-dropzone";
 import removeStopwords from "stopword";
 import ReactWordcloud from "react-wordcloud";
-import { User } from "react-feather";
+import { GitHub } from "react-feather";
 import "tippy.js/dist/tippy.css";
 
 const isLengthMoreThan = minLength => x => x.length > minLength;
@@ -115,9 +115,19 @@ const App = () => {
   if (!data) {
     return (
       <div className="md:h-screen flex items-center">
+        <div style={{ bottom: "2px", right: "15px" }} className="fixed">
+          <a
+            href="https://github.com/sepehr500"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            contact
+            <GitHub className="inline-block mb-1 ml-2" />
+          </a>
+        </div>
         <div className="bg-white max-w-sm mb-10 mx-auto p-3 rounded shadow-lg text-4xl text-center text-red-600">
           <h1 className="border-b border-black">
-            Tinder Stats Download instructions
+            Tinder Stats Download Instructions
           </h1>
           <h3 className="text-2xl my-2 border-b border-black">
             This application will give you useful stats on your Tinder usage
@@ -125,7 +135,7 @@ const App = () => {
           </h3>
           <ol className="text-black text-xl">
             <li>
-              1. Request your data by clicking{" "}
+              1. Request your data by visiting{" "}
               <a
                 target="_blank"
                 rel="noopener"
@@ -270,8 +280,8 @@ const App = () => {
           rel="noopener noreferrer"
           target="_blank"
         >
-          Contact
-          <User className="inline-block mb-1 ml-2" />
+          contact
+          <GitHub className="inline-block mb-1 ml-2" />
         </a>
       </div>
       <h1 className="bg-white max-w-sm mb-10 mx-auto py-3 rounded shadow-lg text-4xl text-center text-red-600">
