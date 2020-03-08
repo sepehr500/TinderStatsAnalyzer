@@ -4,7 +4,41 @@ import { Bar } from "react-chartjs-2";
 import { sum, take } from "ramda";
 import Tippy from "@tippy.js/react";
 import { useDropzone } from "react-dropzone";
+import removeStopwords from "stopword";
+import ReactWordcloud from "react-wordcloud";
+import { User } from "react-feather";
 import "tippy.js/dist/tippy.css";
+
+const isLengthMoreThan = minLength => x => x.length > minLength;
+const isNotEmpty = x => !!x;
+
+const wordCount = (
+  input,
+  { caseSensitive = false, minLength = 2, predicates = [] } = {}
+) => {
+  const applyPredicates = [
+    isNotEmpty,
+    isLengthMoreThan(minLength),
+    ...predicates
+  ];
+
+  const inputWithoutPadding = input.trim();
+
+  return (caseSensitive
+    ? inputWithoutPadding
+    : inputWithoutPadding.toLowerCase()
+  )
+    .split(/\s+/)
+    .filter(x => applyPredicates.every(predicate => predicate(x)))
+    .reduce((acc, word) => {
+      const count = acc[word] || 0;
+
+      return {
+        ...acc,
+        [word]: count + 1
+      };
+    }, {});
+};
 
 const dayOfWeekMap = {
   0: "Sunday",
@@ -80,10 +114,12 @@ const App = () => {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
   if (!data) {
     return (
-      <div className="h-screen flex items-center">
+      <div className="md:h-screen flex items-center">
         <div className="bg-white max-w-sm mb-10 mx-auto p-3 rounded shadow-lg text-4xl text-center text-red-600">
-          <h1>Tinder Stats Download instructions</h1>
-          <h3 className="text-2xl my-2">
+          <h1 className="border-b border-black">
+            Tinder Stats Download instructions
+          </h1>
+          <h3 className="text-2xl my-2 border-b border-black">
             This application will give you useful stats on your Tinder usage
             history
           </h3>
@@ -193,8 +229,51 @@ const App = () => {
     "x"
   );
 
+  const words = data.Messages.reduce(
+    (prev, curr) =>
+      prev +
+      " " +
+      curr.messages.reduce((prev, cur) => prev + " " + cur.message, ""),
+    ""
+  );
+
+  const wordFrequencyList = wordCount(
+    removeStopwords
+      .removeStopwords(
+        words
+          .replace(/[.,\/#!$%?\^&\*;:{}=\-_`~()]/g, "")
+          .replace(/\s{2,}/g, " ")
+          .replace(/for/g, "")
+          .replace(/are/g, "")
+          .replace(/The/g, "")
+          .replace(/the/g, "")
+          .replace(/and/g, "")
+          .replace(/And/g, "")
+          .replace(/You/g, "")
+          .replace(/you/g, "")
+          .split(" ")
+      )
+      .join(" ")
+  );
+  const wordCloudList = Object.entries(wordFrequencyList).map(([key, val]) => ({
+    text: key,
+    value: val
+  }));
+
+  console.log(wordFrequencyList);
+
   return (
     <div className="flex-col justify-center pt-8 container mx-auto pb-1">
+      <div style={{ bottom: "2px", right: "15px" }} className="fixed">
+        <a
+          href="https://github.com/sepehr500"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          Contact
+          <User className="inline-block mb-1 ml-2" />
+        </a>
+      </div>
       <h1 className="bg-white max-w-sm mb-10 mx-auto py-3 rounded shadow-lg text-4xl text-center text-red-600">
         Your Tinder Stats
       </h1>
@@ -301,6 +380,19 @@ const App = () => {
               }
             }}
           />
+        }
+      />
+      <Card
+        title="Word Cloud (work in progress)"
+        description="Word cloud of you messages"
+        body={
+          <div>
+            <ReactWordcloud
+              maxWords={50}
+              words={wordCloudList}
+              options={{ fontSizes: [18, 50] }}
+            />
+          </div>
         }
       />
     </div>
